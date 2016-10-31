@@ -23,6 +23,11 @@ public class Image {
     }
 
     public static boolean saveImage(String fileName, Color[][] pixels){
+        String folderName = getFolderName(fileName);
+        File folder = new File(folderName);
+        if(!folder.exists()){
+            folder.mkdirs();
+        }
         BufferedImage img = new BufferedImage(pixels.length, pixels[0].length, BufferedImage.TYPE_INT_ARGB);
         for(int i = 0; i < pixels.length; i++){
             for (int j = 0; j < pixels[0].length; j++){
@@ -33,7 +38,7 @@ public class Image {
             ImageIO.write(img, "png", new File(fileName));
             return true;
         }
-        catch (IOException e){
+        catch (Exception e){
             System.out.println("fileName = [" + fileName + "] don't exist");
             return false;
         }
@@ -50,6 +55,16 @@ public class Image {
         double a = Math.max(c0.getAlpha(), c1.getAlpha());
 
         return new Color((int) r, (int) g, (int) b, (int) a);
+    }
+
+    private static String getFolderName(String fileName){
+        char[] folderName = fileName.toCharArray();
+        int i = folderName.length-1;
+        while (fileName.charAt(i) != '/'){
+            folderName[i] = ' ';
+            i--;
+        }
+        return fileName.substring(0, i);
     }
 
     private static Color[][] getPixels(int[][] intPixels){
