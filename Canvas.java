@@ -11,8 +11,7 @@ public class Canvas {
     Triangle[] _children;
     int _width;
     int _height;
-    //Color[][] _pixels;
-    int _pixelIndex;
+    int _childernLength;
 
     public float similarity;
 
@@ -20,27 +19,25 @@ public class Canvas {
         _children = new Triangle[childrenCount];
         _width = width;
         _height = height;
-        //_pixels = new Color[width][height];
-        _pixelIndex = 0;
+        _childernLength = 0;
     }
 
     public Canvas(int width, int height, Triangle[] triangles){
         _children = triangles;
         _width = width;
         _height = height;
-        //_pixels = new Color[width][height];
-        _pixelIndex = _children.length;
+        _childernLength = _children.length;
     }
 
     public void addTriangle(Triangle triangle){
-        _children[_pixelIndex++] = triangle;
+        _children[_childernLength++] = triangle;
     }
 
     public Color[][] draw(long window){
         Color[][] pixels = new Color[_width][_height];
         glBegin(GL_TRIANGLES);
         for(int i = 0; i < _children.length; i++){
-            drawTriangle(i, pixels);
+            drawTriangle(i);
         }
         glEnd();
         glfwSwapBuffers(window);
@@ -52,17 +49,13 @@ public class Canvas {
         for (int i = 0; i < pixels[0].length; i++){
             for(int j = pixels.length-1; j >= 0; j--){
                 if(pixels[j][i] == null){
-                    //int indexGL = (i*pixels.length*4) + (j*4);
-                    //float a = pixelsInt[pixelsIndex--];
                     float b = pixelsInt[pixelsIndex--];
                     float g = pixelsInt[pixelsIndex--];
                     float r = pixelsInt[pixelsIndex--];
-                    //pixels[j][i] = new Color(r, g, b, a);
                     pixels[j][i] = new Color(r, g, b);
                 }
             }
         }
-        //Image.saveImage("t.png", pixels);
         return pixels;
     }
 
@@ -89,99 +82,11 @@ public class Canvas {
         return similarity;
     }
 
-    private void drawTriangle(int index, Color[][] pixels){
+    private void drawTriangle(int index){
         _children[index].setGlColor();
         Point[] points = _children[index].getPoints();
         glVertex2f(points[0].x, points[0].y);
         glVertex2f(points[1].x, points[1].y);
         glVertex2f(points[2].x, points[2].y);
-
-        /*
-        Point[] points = _children[index].getPoints();
-        if (points[1].y == points[2].y)
-        {
-            fillBottomFlatTriangle(points, _children[index].getColor(), pixels);
-        }
-        else if (points[0].y == points[1].y)
-        {
-            fillTopFlatTriangle(points, _children[index].getColor(), pixels);
-        }
-        else
-        {
-            Point v4 = new Point(
-                    (int)(points[0].x +
-                            ((float)(points[1].y - points[0].y) / (float)(points[2].y - points[0].y))
-                            * (points[2].x - points[0].x)),
-                    points[1].y);
-
-
-
-            Point[] ps = points.clone();
-            Point[] ps2 = points.clone();
-            ps2[2] = v4;
-            ps[0] = ps[1];
-            ps[1] = v4;
-
-
-            fillBottomFlatTriangle(ps2, _children[index].getColor(), pixels);
-            fillTopFlatTriangle(ps, _children[index].getColor(), pixels);
-        }
-        */
     }
-
-    private void fillBottomFlatTriangle(Point[] points, Color color, Color[][] pixels)
-    {
-        float invslope1 = (points[1].x - points[0].x) / (float)(points[1].y - points[0].y);
-        float invslope2 = (points[2].x - points[0].x) / (float)(points[2].y - points[0].y);
-
-        float curx1 = points[0].x;
-        float curx2 = points[0].x;
-
-        for (int scanlineY = points[0].y; scanlineY >= points[1].y; scanlineY--)
-        {
-            Point p1 = new Point((int)curx1, scanlineY);
-            Point p2 = new Point((int)curx2, scanlineY);
-            drawLine(p1, p2, color, pixels);
-            curx1 -= invslope1;
-            curx2 -= invslope2;
-        }
-    }
-
-    private void fillTopFlatTriangle(Point[] points, Color color, Color[][] pixels)
-    {
-        float invslope1 = (points[2].x - points[0].x) / (float)(points[2].y - points[0].y);
-        float invslope2 = (points[2].x - points[1].x) / (float)(points[2].y - points[1].y);
-
-        float curx1 = points[2].x;
-        float curx2 = points[2].x;
-
-        for (int scanlineY = points[2].y; scanlineY < points[0].y; scanlineY++)
-        {
-            Point p1 = new Point((int)curx1, scanlineY);
-            Point p2 = new Point((int)curx2, scanlineY);
-            drawLine(p1, p2, color, pixels);
-            curx1 += invslope1;
-            curx2 += invslope2;
-        }
-    }
-
-    private void drawLine(Point p1, Point p2, Color color, Color[][] pixels){
-        if(p1.x > p2.x){
-            Point tmp = p1;
-            p1 = p2;
-            p2 = tmp;
-        }
-        for(int i = p1.x; i <= p2.x; i++){
-            setPixel(i, p1.y, color, pixels);
-        }
-    }
-
-    private void setPixel(int x, int y, Color color, Color[][] _pixels){
-        if(_pixels.length <= x || _pixels[0].length <= y) return;
-        if(x < 0 || y < 0) return;
-        if(_pixels[x][y] == null) _pixels[x][y] = color;
-        else _pixels[x][y] = Image.sumColors(color, _pixels[x][y]);
-    }
-
-
 }

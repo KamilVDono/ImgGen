@@ -29,10 +29,6 @@ public class Triangle {
 
         generatePoints(width, height);
 
-        while (isTriangle()) {
-            continue;
-        }
-
         sortPoints();
     }
 
@@ -145,10 +141,6 @@ public class Triangle {
         _points[2] = p;
     }
 
-    boolean isTriangle(){
-        return false;
-    }
-
     float gauss(){
         float x = _random.nextFloat();
         float y = _random.nextFloat();
@@ -160,7 +152,7 @@ public class Triangle {
     }
 
     public Point[] getPoints(){return _points;}
-    public Color getColor(){return _color;}
+
     public void setGlColor(){
         float[] ar = _color.getComponents(null);
         glColor4fv(ar);
